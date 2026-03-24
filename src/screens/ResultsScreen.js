@@ -1,6 +1,8 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, Pressable } from "react-native";
 
 export const ResultsScreen = ({ route, navigation }) => {
+  // Safely extract all the data passed from the ScanScreen
   const {
     lines = 0,
     complexity = 0,
@@ -10,221 +12,229 @@ export const ResultsScreen = ({ route, navigation }) => {
     vulnerabilityList = [],
   } = route.params || {};
 
-  let riskLevel = "Low";
-  let riskColor = "#4CAF50";
-
-  if (tdi >= 20 && tdi <= 50) {
-    riskLevel = "Medium";
-    riskColor = "#E6B800";
-  }
-
-  if (tdi > 50) {
-    riskLevel = "High";
-    riskColor = "#E53935";
-  }
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Analyse Overview</Text>
-
-      {/* Metric Cards */}
-      <View style={styles.row}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Lines of Code</Text>
-          <Text style={styles.cardValue}>{lines}</Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Complexity</Text>
-          <Text style={styles.cardValue}>{complexity}</Text>
-        </View>
-      </View>
-
-      <View style={styles.row}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Security Flags</Text>
-          <Text style={styles.cardValue}>{vulnerabilities}</Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Vulnerability Density</Text>
-          <Text style={styles.cardValue}>
-            {Number(vulnerabilityDensity).toFixed(2)}
-          </Text>
+    <SafeAreaView style={styles.safeArea}>
+      {/* 1. Header (Consistent with Home and Scan screens) */}
+      <View style={styles.header}>
+        <Text style={styles.headerLogo}>Codeshield</Text>
+        <View style={styles.headerRight}>
+          <Pressable 
+            onPress={() => navigation.navigate("Home")}
+            style={({ pressed }) => [pressed && { opacity: 0.5 }]}
+          >
+            <Text style={styles.headerLink}>Home</Text>
+          </Pressable>
+          <Pressable 
+            onPress={() => navigation.navigate("Scan")}
+            style={({ pressed }) => [pressed && { opacity: 0.5 }]}
+          >
+            <Text style={styles.headerLink}>Analyse code</Text>
+          </Pressable>
         </View>
       </View>
 
-      {/* TDI */}
-      <View style={styles.tdiCard}>
-        <Text style={styles.tdiTitle}>Technical Debt Index</Text>
-        <Text style={styles.tdiValue}>{Number(tdi).toFixed(2)}</Text>
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.mainContainer}>
+          
+          {/* 2. Page Title & Export Button */}
+          <View style={styles.titleRow}>
+            <Text style={styles.pageTitle}>ANALYSIS OVERVIEW</Text>
+            <Pressable 
+              style={({ pressed }) => [styles.exportButton, pressed && { opacity: 0.8 }]}
+              onPress={() => alert("Export functionality coming soon!")}
+            >
+              <Text style={styles.exportButtonText}>📥 Export ▾</Text>
+            </Pressable>
+          </View>
 
-      {/* Risk Grid */}
-      <View style={styles.riskGrid}>
-        <View
-          style={[
-            styles.riskBox,
-            riskLevel === "Low" && { backgroundColor: "#4CAF50" },
-          ]}>
-          <Text style={styles.riskText}>Low</Text>
+          {/* 3. Top Metric Cards (Side-by-Side) */}
+          <View style={styles.topCardsContainer}>
+            
+            {/* Left Card: Module Summary */}
+            <View style={styles.metricCard}>
+              <Text style={styles.cardHeader}>📄 Module Summary</Text>
+              
+              <View style={styles.dataRow}>
+                <Text style={styles.dataLabel}>Lines of code:</Text>
+                <Text style={styles.dataValue}>{lines}</Text>
+              </View>
+              
+              <View style={styles.dataRow}>
+                <Text style={styles.dataLabel}>Total alerts:</Text>
+                <Text style={styles.dataValue}>{vulnerabilities}</Text>
+              </View>
+            </View>
+
+            {/* Right Card: Code Metrics */}
+            <View style={styles.metricCard}>
+              <Text style={styles.cardHeader}>📊 Code Metrics</Text>
+              
+              <View style={styles.dataRow}>
+                <Text style={styles.dataLabel}>Complexity:</Text>
+                <Text style={styles.dataValue}>{complexity}</Text>
+              </View>
+              
+              <View style={styles.dataRow}>
+                <Text style={styles.dataLabel}>Density:</Text>
+                <Text style={styles.dataValue}>{Number(vulnerabilityDensity).toFixed(2)}</Text>
+              </View>
+              
+              <View style={styles.dataRow}>
+                <Text style={styles.dataLabel}>Debt index:</Text>
+                <Text style={styles.dataValue}>{Number(tdi).toFixed(0)}</Text>
+              </View>
+            </View>
+
+          </View>
+
+          {/* 4. Bottom Card: Security Red Flags */}
+          <View style={styles.redFlagsCard}>
+            <Text style={styles.cardHeader}>🚩 Security Red Flags</Text>
+            
+            <View style={styles.flagsList}>
+              {Array.isArray(vulnerabilityList) && vulnerabilityList.length > 0 ? (
+                vulnerabilityList.map((flag, index) => (
+                  <Text key={index} style={styles.flagItem}>
+                    • {flag}
+                  </Text>
+                ))
+              ) : (
+                <Text style={styles.flagItem}>✓ No severe vulnerabilities detected.</Text>
+              )}
+            </View>
+          </View>
+
         </View>
-
-        <View
-          style={[
-            styles.riskBox,
-            riskLevel === "Medium" && { backgroundColor: "#E6B800" },
-          ]}>
-          <Text style={styles.riskText}>Medium</Text>
-        </View>
-
-        <View
-          style={[
-            styles.riskBox,
-            riskLevel === "High" && { backgroundColor: "#E53935" },
-          ]}>
-          <Text style={styles.riskText}>High</Text>
-        </View>
-      </View>
-
-      <Text style={[styles.warning, { color: riskColor }]}>
-        ⚠ {riskLevel} Risk Module
-      </Text>
-
-      {/* Security Red Flags */}
-      <View style={styles.redFlagsBox}>
-        <Text style={styles.redFlagTitle}>Security Red Flags</Text>
-
-        {Array.isArray(vulnerabilityList) && vulnerabilityList.length > 0 ? (
-          vulnerabilityList.map((flag, index) => (
-            <Text key={index} style={styles.flagItem}>
-              • {flag}
-            </Text>
-          ))
-        ) : (
-          <Text style={styles.flagItem}>✓ No vulnerabilities detected</Text>
-        )}
-      </View>
-
-      {/* Rescan Button */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Scan")}>
-        <Text style={styles.buttonText}>Rescan Code</Text>
-      </TouchableOpacity>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    padding: 20,
+    backgroundColor: "#0A1D37", 
   },
-
-  title: {
-    fontSize: 26,
+  scrollContent: {
+    paddingBottom: 60,
+    alignItems: "center",
+  },
+ 
+  header: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+    backgroundColor: "#071426",
+    borderBottomWidth: 1,
+    borderBottomColor: "#1A365D",
+  },
+  headerLogo: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  headerRight: {
+    flexDirection: "row",
+    gap: 25,
+  },
+  headerLink: {
+    color: "#E0E0E0",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  // --- Main Layout ---
+  mainContainer: {
+    width: "100%",
+    maxWidth: 900, 
+    padding: 30,
+  },
+ 
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 30,
+    marginTop: 10,
+  },
+  pageTitle: {
+    color: "#FFFFFF",
+    fontSize: 28,
+    fontWeight: "bold",
+    letterSpacing: 1,
+  },
+  exportButton: {
+    backgroundColor: "#3B82F6", 
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  exportButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  
+  topCardsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap", 
+    gap: 20,
+    marginBottom: 20,
+  },
+  metricCard: {
+    flex: 1,
+    minWidth: 300, 
+    backgroundColor: "#11274A", 
+    borderRadius: 12,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: "#1E3A6D",
+   
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  cardHeader: {
+    color: "#FFFFFF",
+    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
   },
-
-  row: {
+  dataRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 15,
+    marginBottom: 12,
   },
-
-  card: {
-    backgroundColor: "#f4f4f4",
-    padding: 15,
-    borderRadius: 10,
-    width: "48%",
-    alignItems: "center",
+  dataLabel: {
+    color: "#E0E0E0",
+    fontSize: 15,
   },
-
-  cardTitle: {
-    fontSize: 14,
-    color: "#555",
-  },
-
-  cardValue: {
-    fontSize: 22,
+  dataValue: {
+    color: "#FFFFFF",
+    fontSize: 15,
     fontWeight: "bold",
   },
-
-  tdiCard: {
-    backgroundColor: "#eaeaea",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
-  },
-
-  tdiTitle: {
-    fontSize: 16,
-    color: "#444",
-  },
-
-  tdiValue: {
-    fontSize: 28,
-    fontWeight: "bold",
-  },
-
-  riskGrid: {
-    flexDirection: "row",
-    marginTop: 20,
+  
+  redFlagsCard: {
+    width: "100%",
+    backgroundColor: "#11274A",
+    borderRadius: 12,
+    padding: 24,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#1E3A6D",
   },
-
-  riskBox: {
-    flex: 1,
-    padding: 12,
-    alignItems: "center",
-    backgroundColor: "#eee",
+  flagsList: {
+    marginTop: 5,
   },
-
-  riskText: {
-    fontWeight: "bold",
-  },
-
-  warning: {
-    textAlign: "center",
-    marginTop: 12,
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-
-  redFlagsBox: {
-    backgroundColor: "#2f4368",
-    padding: 15,
-    borderRadius: 8,
-    marginTop: 20,
-  },
-
-  redFlagTitle: {
-    color: "white",
-    fontWeight: "bold",
-    marginBottom: 10,
-    fontSize: 16,
-  },
-
   flagItem: {
-    color: "white",
-    marginBottom: 4,
-  },
-
-  button: {
-    backgroundColor: "#666",
-    padding: 15,
-    borderRadius: 8,
-    marginTop: 25,
-  },
-
-  buttonText: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "bold",
+    color: "#E0E0E0",
+    fontSize: 15,
+    marginBottom: 10,
+    lineHeight: 22,
   },
 });
 
