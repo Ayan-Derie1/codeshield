@@ -81,9 +81,6 @@ export const ScanScreen = ({ navigation }) => {
           >
             <Text style={styles.headerLink}>Home</Text>
           </Pressable>
-          <Pressable style={({ pressed }) => [pressed && { opacity: 0.5 }]}>
-            <Text style={styles.headerLink}>Analyse code</Text>
-          </Pressable>
         </View>
       </View>
 
