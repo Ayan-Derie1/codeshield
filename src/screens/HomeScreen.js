@@ -8,16 +8,11 @@ export const HomeScreen = ({ navigation }) => {
       <View style={styles.header}>
         <Text style={styles.headerLogo}>Codeshield</Text>
         <View style={styles.headerRight}>
-          {/* This is now your ONLY navigation button */}
           <Pressable 
-            onPress={() => navigation.navigate("Scan")}
+            onPress={() => navigation.navigate("Methodology")}
             style={({ pressed }) => [pressed && { opacity: 0.5 }]}
           >
-            <Text style={styles.headerLink}>Analyse code</Text>
-          </Pressable>
-          
-          <Pressable style={({ pressed }) => [pressed && { opacity: 0.5 }]}>
-            <Text style={styles.headerLink}>Assessment</Text>
+            <Text style={styles.headerLink}>Methodology</Text>
           </Pressable>
         </View>
       </View>
@@ -34,10 +29,10 @@ export const HomeScreen = ({ navigation }) => {
         {/* 3. Titles */}
         <Text style={styles.title}>Codeshield</Text>
         <Text style={styles.subtitle}>
-          Analyse code complexity and security risks to prioritise smarter refactoring decisions
+          Identify high-risk code modules, reduce techincal debt, and improve long-term maintainability with intelligent code risk analysis 
         </Text>
 
-        {/* 4. Action Cards (Now standard Views, NOT clickable) */}
+        {/* 4. Action Cards */}
         <View style={styles.cardContainer}>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Cyclomatic complexity</Text>
@@ -49,17 +44,28 @@ export const HomeScreen = ({ navigation }) => {
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Vulnerability density</Text>
             <Text style={styles.cardDescription}>
-              Identify security risks and patterns
+              Identify security risks and unsafe coding patterns
             </Text>
           </View>
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Tech debt index</Text>
             <Text style={styles.cardDescription}>
-              Make data driven for optional code health
+              Make data-driven decisions for optimal code health
             </Text>
           </View>
         </View>
+
+        {/* 5. BIG Call to Action Button */}
+        <Pressable 
+          onPress={() => navigation.navigate("Scan")}
+          style={({ pressed }) => [
+            styles.ctaButton,
+            pressed && styles.ctaButtonPressed 
+          ]}
+        >
+          <Text style={styles.ctaButtonText}>Start Code Analysis</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -74,13 +80,12 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
     alignItems: "center",
   },
-  // --- Header Styles ---
   header: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 30,
+    paddingHorizontal: 35,
     paddingVertical: 20,
     backgroundColor: "#071426",
   },
@@ -98,29 +103,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
   },
-  // --- Center Content Styles ---
   imageContainer: {
-    width: 160, 
-    height: 160, 
+    width: 210, 
+    height: 210, 
     marginTop: 50,
     marginBottom: 20,
-    borderRadius: 35, 
+    borderRadius: 50, 
     shadowColor: "#4A90E2",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 25,
-    elevation: 15, 
+    elevation: 20, 
   },
   shieldImage: {
     width: "100%",
     height: "100%",
-    borderRadius: 35, 
+    borderRadius: 50, 
   },
   title: {
-    fontSize: 32,
+    fontSize: 44, 
     fontWeight: "bold",
     color: "#FFFFFF",
-    marginBottom: 12,
+    marginBottom: 50,
   },
   subtitle: {
     fontSize: 16,
@@ -129,9 +133,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     maxWidth: 600,
     lineHeight: 24,
-    marginBottom: 50,
+    marginBottom: 55, 
   },
-  // --- Card Styles ---
   cardContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -139,6 +142,7 @@ const styles = StyleSheet.create({
     gap: 20,
     paddingHorizontal: 20,
     maxWidth: 1000,
+    marginBottom: 60, 
   },
   card: {
     backgroundColor: "#1A365D",
@@ -158,6 +162,27 @@ const styles = StyleSheet.create({
     color: "#A0AAB2",
     fontSize: 14,
     lineHeight: 20,
+  },
+  ctaButton: {
+    backgroundColor: "#3B82F6", 
+    paddingVertical: 18,
+    paddingHorizontal: 45,
+    borderRadius: 30, 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  ctaButtonPressed: {
+    backgroundColor: "#2563EB", 
+    transform: [{ scale: 0.96 }], 
+  },
+  ctaButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+    letterSpacing: 1,
   },
 });
 
