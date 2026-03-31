@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  Pressable,
+} from "react-native";
 
 export const ResultsScreen = ({ route, navigation }) => {
   // Safely extract all the data passed from the ScanScreen
@@ -18,16 +25,14 @@ export const ResultsScreen = ({ route, navigation }) => {
       <View style={styles.header}>
         <Text style={styles.headerLogo}>Codeshield</Text>
         <View style={styles.headerRight}>
-          <Pressable 
+          <Pressable
             onPress={() => navigation.navigate("Home")}
-            style={({ pressed }) => [pressed && { opacity: 0.5 }]}
-          >
+            style={({ pressed }) => [pressed && { opacity: 0.5 }]}>
             <Text style={styles.headerLink}>Home</Text>
           </Pressable>
-          <Pressable 
+          <Pressable
             onPress={() => navigation.navigate("Scan")}
-            style={({ pressed }) => [pressed && { opacity: 0.5 }]}
-          >
+            style={({ pressed }) => [pressed && { opacity: 0.5 }]}>
             <Text style={styles.headerLink}>Analyse code</Text>
           </Pressable>
         </View>
@@ -35,30 +40,30 @@ export const ResultsScreen = ({ route, navigation }) => {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.mainContainer}>
-          
           {/* 2. Page Title & Export Button */}
           <View style={styles.titleRow}>
             <Text style={styles.pageTitle}>ANALYSIS OVERVIEW</Text>
-            <Pressable 
-              style={({ pressed }) => [styles.exportButton, pressed && { opacity: 0.8 }]}
-              onPress={() => alert("Export functionality coming soon!")}
-            >
+            <Pressable
+              style={({ pressed }) => [
+                styles.exportButton,
+                pressed && { opacity: 0.8 },
+              ]}
+              onPress={() => alert("Export functionality coming soon!")}>
               <Text style={styles.exportButtonText}>📥 Export ▾</Text>
             </Pressable>
           </View>
 
           {/* 3. Top Metric Cards (Side-by-Side) */}
           <View style={styles.topCardsContainer}>
-            
             {/* Left Card: Module Summary */}
             <View style={styles.metricCard}>
               <Text style={styles.cardHeader}>📄 Module Summary</Text>
-              
+
               <View style={styles.dataRow}>
                 <Text style={styles.dataLabel}>Lines of code:</Text>
                 <Text style={styles.dataValue}>{lines}</Text>
               </View>
-              
+
               <View style={styles.dataRow}>
                 <Text style={styles.dataLabel}>Total alerts:</Text>
                 <Text style={styles.dataValue}>{vulnerabilities}</Text>
@@ -68,42 +73,44 @@ export const ResultsScreen = ({ route, navigation }) => {
             {/* Right Card: Code Metrics */}
             <View style={styles.metricCard}>
               <Text style={styles.cardHeader}>📊 Code Metrics</Text>
-              
+
               <View style={styles.dataRow}>
                 <Text style={styles.dataLabel}>Complexity:</Text>
                 <Text style={styles.dataValue}>{complexity}</Text>
               </View>
-              
+
               <View style={styles.dataRow}>
                 <Text style={styles.dataLabel}>Density:</Text>
-                <Text style={styles.dataValue}>{Number(vulnerabilityDensity).toFixed(2)}</Text>
+                <Text style={styles.dataValue}>
+                  {Number(vulnerabilityDensity).toFixed(2)}
+                </Text>
               </View>
-              
+
               <View style={styles.dataRow}>
                 <Text style={styles.dataLabel}>Debt index:</Text>
                 <Text style={styles.dataValue}>{Number(tdi).toFixed(0)}</Text>
               </View>
             </View>
-
           </View>
 
           {/* 4. Bottom Card: Security Red Flags */}
           <View style={styles.redFlagsCard}>
             <Text style={styles.cardHeader}>🚩 Security Red Flags</Text>
-            
+
             <View style={styles.flagsList}>
-              {Array.isArray(vulnerabilityList) && vulnerabilityList.length > 0 ? (
+              {vulnerabilityList?.length ? (
                 vulnerabilityList.map((flag, index) => (
                   <Text key={index} style={styles.flagItem}>
                     • {flag}
                   </Text>
                 ))
               ) : (
-                <Text style={styles.flagItem}>✓ No severe vulnerabilities detected.</Text>
+                <Text style={styles.flagItem}>
+                  ✓ No severe vulnerabilities detected.
+                </Text>
               )}
             </View>
           </View>
-
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -113,13 +120,13 @@ export const ResultsScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#0A1D37", 
+    backgroundColor: "#0A1D37",
   },
   scrollContent: {
     paddingBottom: 60,
     alignItems: "center",
   },
- 
+
   header: {
     width: "100%",
     flexDirection: "row",
@@ -148,10 +155,10 @@ const styles = StyleSheet.create({
   // --- Main Layout ---
   mainContainer: {
     width: "100%",
-    maxWidth: 900, 
+    maxWidth: 900,
     padding: 30,
   },
- 
+
   titleRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -166,7 +173,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   exportButton: {
-    backgroundColor: "#3B82F6", 
+    backgroundColor: "#3B82F6",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -176,22 +183,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 14,
   },
-  
+
   topCardsContainer: {
     flexDirection: "row",
-    flexWrap: "wrap", 
+    flexWrap: "wrap",
     gap: 20,
     marginBottom: 20,
   },
   metricCard: {
     flex: 1,
-    minWidth: 300, 
-    backgroundColor: "#11274A", 
+    minWidth: 300,
+    backgroundColor: "#11274A",
     borderRadius: 12,
     padding: 24,
     borderWidth: 1,
     borderColor: "#1E3A6D",
-   
+
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -218,7 +225,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
   },
-  
+
   redFlagsCard: {
     width: "100%",
     backgroundColor: "#11274A",
