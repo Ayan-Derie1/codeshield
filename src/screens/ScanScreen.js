@@ -51,11 +51,11 @@ export const ScanScreen = ({ navigation }) => {
 
     const lines = code.split("\n").length;
     const complexity = calculateCyclomaticComplexity(code);
-    const vulnerabilityList = detectVulnerabilities(code) || [];
-    const vulnerabilities = vulnerabilityList.length;
+    const vulnerabilities = detectVulnerabilities(code) || 0;
+    const vulnerabilityList = [];
     const vulnerabilityDensity = calculateVulnerabilityDensity(
       vulnerabilities,
-      lines
+      lines,
     );
     const tdi = calculateTDI(complexity, vulnerabilityDensity);
 
@@ -75,10 +75,9 @@ export const ScanScreen = ({ navigation }) => {
       <View style={styles.header}>
         <Text style={styles.headerLogo}>Codeshield</Text>
         <View style={styles.headerRight}>
-          <Pressable 
+          <Pressable
             onPress={() => navigation.navigate("Home")} // Navigate back home
-            style={({ pressed }) => [pressed && { opacity: 0.5 }]}
-          >
+            style={({ pressed }) => [pressed && { opacity: 0.5 }]}>
             <Text style={styles.headerLink}>Home</Text>
           </Pressable>
         </View>
@@ -88,12 +87,13 @@ export const ScanScreen = ({ navigation }) => {
       <View style={styles.mainContainer}>
         {/* The Glassmorphism Box */}
         <View style={styles.uploadBox}>
-          
           {/* Top Section: Upload Button */}
-          <Pressable onPress={handleFilePick} style={({ pressed }) => [
-            styles.uploadHeader,
-            pressed && { opacity: 0.7 }
-          ]}>
+          <Pressable
+            onPress={handleFilePick}
+            style={({ pressed }) => [
+              styles.uploadHeader,
+              pressed && { opacity: 0.7 },
+            ]}>
             <Text style={styles.uploadTitle}>📄 Upload File</Text>
             {fileName ? (
               <Text style={styles.fileNameText}>{fileName}</Text>
@@ -112,15 +112,18 @@ export const ScanScreen = ({ navigation }) => {
 
           {/* Bottom Section: Action Buttons */}
           <View style={styles.actionRow}>
-            <Pressable onPress={handleClear} style={({ pressed }) => [pressed && { opacity: 0.5 }]}>
+            <Pressable
+              onPress={handleClear}
+              style={({ pressed }) => [pressed && { opacity: 0.5 }]}>
               <Text style={styles.clearButtonText}>Clear</Text>
             </Pressable>
 
-            <Pressable onPress={analyseCode} style={({ pressed }) => [pressed && { opacity: 0.5 }]}>
+            <Pressable
+              onPress={analyseCode}
+              style={({ pressed }) => [pressed && { opacity: 0.5 }]}>
               <Text style={styles.analyseButtonText}>Analyse</Text>
             </Pressable>
           </View>
-
         </View>
       </View>
     </SafeAreaView>
@@ -203,7 +206,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlignVertical: "center", // Vertically centers placeholder (mostly for Android)
     ...Platform.select({
-      web: { outlineStyle: 'none' } // Removes the default focus ring on web browsers
+      web: { outlineStyle: "none" }, // Removes the default focus ring on web browsers
     }),
   },
   // --- Bottom Action Row ---
