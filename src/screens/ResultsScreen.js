@@ -17,18 +17,10 @@ export const ResultsScreen = ({ route, navigation }) => {
     tdi = 0,
     vulnerabilityList = [],
   } = route.params || {};
-
   const getSeverityColor = (severity) => {
-    switch (severity) {
-      case "High":
-        return "#E53935"; // RED
-      case "Medium":
-        return "#FB8C00"; // ORANGE
-      case "Low":
-        return "#4CAF50"; // GREEN
-      default:
-        return "#4CAF50"; // fallback = safe
-    }
+    if (severity === "High") return "#E53935"; // 🔴 Red
+    if (severity === "Medium") return "#FB8C00"; // 🟠 Orange
+    return "#4CAF50"; // 🟢 Safe
   };
 
   return (

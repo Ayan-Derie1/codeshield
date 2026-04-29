@@ -45,13 +45,28 @@ export const ScanScreen = ({ navigation }) => {
     setCode("");
     setFileName("");
   };
-
   const analyseCode = () => {
-    if (!code.trim()) return; // Prevent analyzing empty input
+    if (!code.trim()) {
+      alert("Please enter or upload code to analyse.");
+      return;
+    }
+
+    if (code.length > 50000) {
+      alert("File too large. Please upload a smaller file.");
+      return;
+    }
 
     const lines = code.split("\n").length;
     const complexity = calculateCyclomaticComplexity(code);
-    const vulnerabilityList = detectVulnerabilities(code);
+
+    const rawVulnerabilities = detectVulnerabilities(code);
+
+    const seen = new Set();
+    const vulnerabilityList = rawVulnerabilities.filter((v) => {
+      if (seen.has(v.name)) return false;
+      seen.add(v.name);
+      return true;
+    });
 
     const vulnerabilities = vulnerabilityList.length;
 
@@ -59,6 +74,7 @@ export const ScanScreen = ({ navigation }) => {
       vulnerabilities,
       lines,
     );
+
     const tdi = calculateTDI(complexity, vulnerabilityDensity);
 
     navigation.navigate("Results", {
@@ -70,7 +86,6 @@ export const ScanScreen = ({ navigation }) => {
       vulnerabilityList,
     });
   };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* 1. Header (Reused from HomeScreen, minus login) */}
