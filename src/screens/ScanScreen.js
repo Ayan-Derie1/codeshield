@@ -16,6 +16,7 @@ import {
   calculateVulnerabilityDensity,
   calculateTDI,
 } from "../scanner/metrics";
+import { detectLanguage } from "../scanner/languageDetector";
 
 export const ScanScreen = ({ navigation }) => {
   const [code, setCode] = useState("");
@@ -55,18 +56,40 @@ export const ScanScreen = ({ navigation }) => {
       alert("File too large. Please upload a smaller file.");
       return;
     }
-
+    const language = detectLanguage(code);
     const lines = code.split("\n").length;
     const complexity = calculateCyclomaticComplexity(code);
 
     const rawVulnerabilities = detectVulnerabilities(code);
 
-    const seen = new Set();
-    const vulnerabilityList = rawVulnerabilities.filter((v) => {
-      if (seen.has(v.name)) return false;
-      seen.add(v.name);
-      return true;
-    });
+    // 🔥 Intelligent prioritisation
+    const highRisks = rawVulnerabilities.filter((v) => v.severity === "High");
+    const mediumRisks = rawVulnerabilities.filter(
+      (v) => v.severity === "Medium",
+    );
+
+    highRisks.sort((a, b) => b.priority - a.priority);
+    mediumRisks.sort((a, b) => b.priority - a.priority);
+
+    const vulnerabilityList = [];
+
+    if (highRisks.length > 0) {
+      vulnerabilityList.push(highRisks[0]);
+    }
+
+    if (mediumRisks.length > 0) {
+      vulnerabilityList.push(mediumRisks[0]);
+    }
+
+    // ✅ Safe fallback
+    if (vulnerabilityList.length === 0) {
+      vulnerabilityList.push({
+        name: "No major risks",
+        severity: "Safe",
+        description: "No high or medium vulnerabilities detected.",
+        recommendation: "Code follows safe practices.",
+      });
+    }
 
     const vulnerabilities = vulnerabilityList.length;
 
@@ -84,6 +107,7 @@ export const ScanScreen = ({ navigation }) => {
       vulnerabilityDensity,
       tdi,
       vulnerabilityList,
+      language,
     });
   };
   return (

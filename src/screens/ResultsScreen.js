@@ -16,6 +16,7 @@ export const ResultsScreen = ({ route, navigation }) => {
     vulnerabilityDensity = 0,
     tdi = 0,
     vulnerabilityList = [],
+    language = "Unknown",
   } = route.params || {};
   const getSeverityColor = (severity) => {
     if (severity === "High") return "#E53935"; // 🔴 Red
@@ -61,6 +62,10 @@ export const ResultsScreen = ({ route, navigation }) => {
           <View style={styles.topCardsContainer}>
             <View style={styles.metricCard}>
               <Text style={styles.cardHeader}>📄 Module Summary</Text>
+              <View style={styles.dataRow}>
+                <Text style={styles.dataLabel}>Language:</Text>
+                <Text style={styles.dataValue}>{language}</Text>
+              </View>
 
               <View style={styles.dataRow}>
                 <Text style={styles.dataLabel}>Lines of code:</Text>
