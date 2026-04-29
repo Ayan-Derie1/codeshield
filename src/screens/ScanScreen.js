@@ -51,8 +51,10 @@ export const ScanScreen = ({ navigation }) => {
 
     const lines = code.split("\n").length;
     const complexity = calculateCyclomaticComplexity(code);
-    const vulnerabilities = detectVulnerabilities(code) || 0;
-    const vulnerabilityList = [];
+    const vulnerabilityList = detectVulnerabilities(code);
+
+    const vulnerabilities = vulnerabilityList.length;
+
     const vulnerabilityDensity = calculateVulnerabilityDensity(
       vulnerabilities,
       lines,
