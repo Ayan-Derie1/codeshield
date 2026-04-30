@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   ScrollView,
   Pressable,
+  Platform, // <-- Added Platform import here
 } from "react-native";
 
 export const ResultsScreen = ({ route, navigation }) => {
@@ -18,10 +19,63 @@ export const ResultsScreen = ({ route, navigation }) => {
     vulnerabilityList = [],
     language = "Unknown",
   } = route.params || {};
+
   const getSeverityColor = (severity) => {
     if (severity === "High") return "#E53935"; // 🔴 Red
     if (severity === "Medium") return "#FB8C00"; // 🟠 Orange
     return "#4CAF50"; // 🟢 Safe
+  };
+
+  // --- NEW EXPORT FUNCTION ---
+  const handleExport = () => {
+    // 1. Format the vulnerabilities nicely for the text file
+    const formatVulnerabilities = () => {
+      if (!vulnerabilityList || vulnerabilityList.length === 0) {
+        return "✓ No severe vulnerabilities detected.";
+      }
+      return vulnerabilityList
+        .map(
+          (flag) =>
+            `[${flag.severity.toUpperCase()}] ${flag.name}\n   Description: ${flag.description}\n   Recommendation: ${flag.recommendation}\n`
+        )
+        .join("\n");
+    };
+
+    // 2. Build the final text report
+    const reportContent = `
+=========================================
+      CODESHIELD ANALYSIS REPORT
+=========================================
+Date: ${new Date().toLocaleString()}
+
+--- MODULE SUMMARY ---
+Language: ${language}
+Lines of Code: ${lines}
+Total Alerts: ${vulnerabilities}
+
+--- CODE METRICS ---
+Cyclomatic Complexity: ${complexity}
+Vulnerability Density: ${Number(vulnerabilityDensity).toFixed(2)}
+Technical Debt Index (TDI): ${Number(tdi).toFixed(0)}
+
+--- SECURITY RED FLAGS ---
+${formatVulnerabilities()}
+=========================================
+    `.trim();
+
+    // 3. Trigger the download based on the platform
+    if (Platform.OS === "web") {
+      const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `CodeShield_Report_${Date.now()}.txt`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      alert("Mobile export requires expo-sharing. Testing on web is recommended for this demo!");
+    }
   };
 
   return (
@@ -49,12 +103,14 @@ export const ResultsScreen = ({ route, navigation }) => {
           <View style={styles.titleRow}>
             <Text style={styles.pageTitle}>ANALYSIS OVERVIEW</Text>
 
+            {/* --- UPDATED EXPORT BUTTON --- */}
             <Pressable
               style={({ pressed }) => [
                 styles.exportButton,
                 pressed && { opacity: 0.8 },
               ]}
-              onPress={() => alert("Export functionality coming soon!")}>
+              onPress={handleExport}
+            >
               <Text style={styles.exportButtonText}>📥 Export ▾</Text>
             </Pressable>
           </View>
@@ -155,12 +211,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#0A1D37",
   },
-
   scrollContent: {
     paddingBottom: 60,
     alignItems: "center",
   },
-
   header: {
     width: "100%",
     flexDirection: "row",
@@ -172,30 +226,25 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#1A365D",
   },
-
   headerLogo: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
   },
-
   headerRight: {
     flexDirection: "row",
     gap: 25,
   },
-
   headerLink: {
     color: "#E0E0E0",
     fontSize: 14,
     fontWeight: "500",
   },
-
   mainContainer: {
     width: "100%",
     maxWidth: 900,
     padding: 30,
   },
-
   titleRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -203,34 +252,29 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: 10,
   },
-
   pageTitle: {
     color: "#FFFFFF",
     fontSize: 28,
     fontWeight: "bold",
     letterSpacing: 1,
   },
-
   exportButton: {
     backgroundColor: "#3B82F6",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
   },
-
   exportButtonText: {
     color: "#FFFFFF",
     fontWeight: "bold",
     fontSize: 14,
   },
-
   topCardsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 20,
     marginBottom: 20,
   },
-
   metricCard: {
     flex: 1,
     minWidth: 300,
@@ -245,31 +289,26 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 6,
   },
-
   cardHeader: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
   },
-
   dataRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 12,
   },
-
   dataLabel: {
     color: "#E0E0E0",
     fontSize: 15,
   },
-
   dataValue: {
     color: "#FFFFFF",
     fontSize: 15,
     fontWeight: "bold",
   },
-
   redFlagsCard: {
     width: "100%",
     backgroundColor: "#11274A",
@@ -278,11 +317,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#1E3A6D",
   },
-
   flagsList: {
     marginTop: 5,
   },
-
   flagBox: {
     backgroundColor: "#071426",
     padding: 15,
@@ -290,14 +327,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderLeftWidth: 4,
   },
-
   flagHeaderRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 8,
   },
-
   flagTitle: {
     color: "#FFFFFF",
     fontSize: 16,
@@ -305,7 +340,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingRight: 10,
   },
-
   severityBadge: {
     color: "#FFFFFF",
     fontSize: 12,
@@ -315,21 +349,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
   },
-
   flagDescription: {
     color: "#E0E0E0",
     fontSize: 14,
     lineHeight: 21,
     marginBottom: 6,
   },
-
   recommendation: {
     color: "#4CAF50",
     fontSize: 14,
     lineHeight: 20,
     marginTop: 4,
   },
-
   flagItem: {
     color: "#E0E0E0",
     fontSize: 15,
