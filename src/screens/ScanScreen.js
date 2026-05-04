@@ -28,7 +28,6 @@ export const ScanScreen = ({ navigation }) => {
         type: "*/*",
       });
 
-      // Updated to match the newer Expo DocumentPicker API structure
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const file = result.assets[0];
         setFileName(file.name);
@@ -46,6 +45,7 @@ export const ScanScreen = ({ navigation }) => {
     setCode("");
     setFileName("");
   };
+
   const analyseCode = () => {
     if (!code.trim()) {
       alert("Please enter or upload code to analyse.");
@@ -56,13 +56,17 @@ export const ScanScreen = ({ navigation }) => {
       alert("File too large. Please upload a smaller file.");
       return;
     }
+
     const language = detectLanguage(code);
     const lines = code.split("\n").length;
     const complexity = calculateCyclomaticComplexity(code);
 
     const rawVulnerabilities = detectVulnerabilities(code);
 
-    // 🔥 Intelligent prioritisation
+    // ✅ FIXED: Get the TOTAL count of all real vulnerabilities found for the math
+    const totalVulnerabilities = rawVulnerabilities.length;
+
+    // 🔥 Intelligent prioritisation (for the UI display list)
     const highRisks = rawVulnerabilities.filter((v) => v.severity === "High");
     const mediumRisks = rawVulnerabilities.filter(
       (v) => v.severity === "Medium",
@@ -91,10 +95,9 @@ export const ScanScreen = ({ navigation }) => {
       });
     }
 
-    const vulnerabilities = vulnerabilityList.length;
-
+    // ✅ FIXED: Use the total count for the math density formula
     const vulnerabilityDensity = calculateVulnerabilityDensity(
-      vulnerabilities,
+      totalVulnerabilities,
       lines,
     );
 
@@ -103,21 +106,22 @@ export const ScanScreen = ({ navigation }) => {
     navigation.navigate("Results", {
       lines,
       complexity,
-      vulnerabilities,
+      vulnerabilities: totalVulnerabilities, // ✅ Passed total count to show accurately in "Total Alerts"
       vulnerabilityDensity,
       tdi,
       vulnerabilityList,
       language,
     });
   };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* 1. Header (Reused from HomeScreen, minus login) */}
+      {/* 1. Header */}
       <View style={styles.header}>
         <Text style={styles.headerLogo}>Codeshield</Text>
         <View style={styles.headerRight}>
           <Pressable
-            onPress={() => navigation.navigate("Home")} // Navigate back home
+            onPress={() => navigation.navigate("Home")}
             style={({ pressed }) => [pressed && { opacity: 0.5 }]}>
             <Text style={styles.headerLink}>Home</Text>
           </Pressable>
@@ -174,9 +178,8 @@ export const ScanScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#0A1D37", // Matches the dark background
+    backgroundColor: "#0A1D37", 
   },
-  // --- Header Styles (Identical to HomeScreen) ---
   header: {
     width: "100%",
     flexDirection: "row",
@@ -202,7 +205,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
   },
-  // --- Main Content Styles ---
   mainContainer: {
     flex: 1,
     justifyContent: "center",
@@ -211,15 +213,14 @@ const styles = StyleSheet.create({
   },
   uploadBox: {
     width: "100%",
-    maxWidth: 800, // Keeps it from stretching too wide on desktop monitors
-    backgroundColor: "rgba(30, 63, 109, 0.4)", // Translucent blue for glass effect
+    maxWidth: 800, 
+    backgroundColor: "rgba(30, 63, 109, 0.4)", 
     borderWidth: 2,
-    borderColor: "#4A90E2", // Bright blue border from your design
+    borderColor: "#4A90E2", 
     borderRadius: 16,
     padding: 20,
-    height: 500, // Fixed height for a robust feel
+    height: 500, 
   },
-  // --- Upload Section ---
   uploadHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -237,20 +238,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: "italic",
   },
-  // --- Text Input Section ---
   textInput: {
     flex: 1,
-    backgroundColor: "#4C6B9C", // Slightly lighter blue background inside the box
+    backgroundColor: "#4C6B9C", 
     borderRadius: 8,
     padding: 20,
     color: "#FFFFFF",
     fontSize: 18,
-    textAlignVertical: "center", // Vertically centers placeholder (mostly for Android)
+    textAlignVertical: "center", 
     ...Platform.select({
-      web: { outlineStyle: "none" }, // Removes the default focus ring on web browsers
+      web: { outlineStyle: "none" }, 
     }),
   },
-  // --- Bottom Action Row ---
   actionRow: {
     flexDirection: "row",
     justifyContent: "space-between",

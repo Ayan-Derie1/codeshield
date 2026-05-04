@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   ScrollView,
   Pressable,
-  Platform, // <-- Added Platform import here
+  Platform, 
 } from "react-native";
 
 export const ResultsScreen = ({ route, navigation }) => {
@@ -26,9 +26,7 @@ export const ResultsScreen = ({ route, navigation }) => {
     return "#4CAF50"; // 🟢 Safe
   };
 
-  // --- NEW EXPORT FUNCTION ---
   const handleExport = () => {
-    // 1. Format the vulnerabilities nicely for the text file
     const formatVulnerabilities = () => {
       if (!vulnerabilityList || vulnerabilityList.length === 0) {
         return "✓ No severe vulnerabilities detected.";
@@ -41,10 +39,9 @@ export const ResultsScreen = ({ route, navigation }) => {
         .join("\n");
     };
 
-    // 2. Build the final text report
     const reportContent = `
 =========================================
-      CODESHIELD ANALYSIS REPORT
+     CODESHIELD ANALYSIS REPORT
 =========================================
 Date: ${new Date().toLocaleString()}
 
@@ -63,7 +60,6 @@ ${formatVulnerabilities()}
 =========================================
     `.trim();
 
-    // 3. Trigger the download based on the platform
     if (Platform.OS === "web") {
       const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -103,7 +99,6 @@ ${formatVulnerabilities()}
           <View style={styles.titleRow}>
             <Text style={styles.pageTitle}>ANALYSIS OVERVIEW</Text>
 
-            {/* --- UPDATED EXPORT BUTTON --- */}
             <Pressable
               style={({ pressed }) => [
                 styles.exportButton,
@@ -151,7 +146,15 @@ ${formatVulnerabilities()}
 
               <View style={styles.dataRow}>
                 <Text style={styles.dataLabel}>Debt index:</Text>
-                <Text style={styles.dataValue}>{Number(tdi).toFixed(0)}</Text>
+                {/* ✅ FIXED: The TDI will now turn RED and BOLD if it hits the 50 threshold */}
+                <Text 
+                  style={[
+                    styles.dataValue,
+                    tdi >= 50 ? { color: "#E53935", fontWeight: "bold" } : {} 
+                  ]}
+                >
+                  {Number(tdi).toFixed(0)}
+                </Text>
               </View>
             </View>
           </View>
